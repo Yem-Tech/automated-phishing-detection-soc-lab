@@ -63,3 +63,71 @@ SOC Dashboard + Analyst Email Notification
 - JSON
 - python-dotenv
 - Requests
+
+## Lab Environment
+
+The project was developed in a virtualized cybersecurity lab environment using VirtualBox. Separate virtual machines were used to isolate the security monitoring components and simulate a realistic SOC architecture.
+
+### Kali Linux
+
+Kali Linux was used as the automation and security testing system.
+
+Primary functions included:
+
+- Running the `phish_sender.py` phishing simulation script
+- Running the `email_monitor.py` monitoring and automation script
+- Connecting to Gmail through IMAP
+- Extracting URLs and email metadata
+- Querying the VirusTotal API for URL reputation
+- Sending enriched security events to Splunk through HEC
+- Testing connectivity between the monitoring system and Splunk
+
+### Ubuntu Server
+
+Ubuntu Server was used to host Splunk Enterprise.
+
+Primary functions included:
+
+- Hosting the Splunk Enterprise SIEM
+- Receiving JSON events through the Splunk HTTP Event Collector (HEC)
+- Storing email security events in the `gmail_logs` index
+- Running SPL searches and phishing detection rules
+- Hosting the phishing monitoring dashboard
+- Generating scheduled high-severity alerts
+- Sending automated email notifications to the analyst
+
+### Gmail
+
+Gmail was used as the email platform for the controlled phishing simulation.
+
+The Python monitoring script connects to Gmail through IMAP and processes messages from the monitored mailbox. SMTP was also configured in Splunk to deliver automated phishing alert notifications to the analyst.
+
+### VirusTotal
+
+VirusTotal was integrated through its API to provide threat-intelligence enrichment for URLs extracted from monitored emails.
+
+For each extracted URL, the monitoring script records available reputation statistics such as:
+
+- Malicious detections
+- Suspicious detections
+- Harmless detections
+- Undetected results
+- VirusTotal analysis ID
+
+This enrichment allows Splunk analysts to examine both email-based phishing indicators and external URL reputation data.
+
+## Network and Data Flow
+
+The primary communication flow in the lab is:
+
+1. `phish_sender.py` generates a controlled phishing simulation email.
+2. The simulated email is delivered to the monitored Gmail mailbox.
+3. `email_monitor.py` retrieves and parses the email.
+4. Embedded URLs are extracted from the message.
+5. URLs are submitted to the VirusTotal API for reputation analysis.
+6. Email metadata and VirusTotal results are combined into a structured JSON event.
+7. The event is transmitted to Splunk Enterprise using HEC over port `8088`.
+8. Splunk indexes the event in `gmail_logs` with the `email_event` sourcetype.
+9. SPL detection logic evaluates the event for phishing indicators.
+10. Matching events trigger a high-severity Splunk alert.
+11. Splunk records the alert under Triggered Alerts and sends an automated email notification to the analyst.
