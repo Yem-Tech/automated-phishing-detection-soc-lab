@@ -131,3 +131,55 @@ The primary communication flow in the lab is:
 9. SPL detection logic evaluates the event for phishing indicators.
 10. Matching events trigger a high-severity Splunk alert.
 11. Splunk records the alert under Triggered Alerts and sends an automated email notification to the analyst.
+
+12. ## Project Evidence
+
+### Splunk SOC Dashboard
+
+The dashboard provides a centralized view of phishing activity, URL analysis, sender activity, and investigation data.
+
+![Splunk SOC Dashboard](screenshots/1_splunk-dashboard.png)
+
+---
+
+### VirusTotal Enrichment
+
+Extracted URLs are submitted to VirusTotal, and the resulting reputation data is added to the event before ingestion into Splunk.
+
+![VirusTotal Enrichment](screenshots/2_virustotal-enrichment.png)
+
+---
+
+### Triggered High-Severity Alert
+
+Splunk automatically creates a high-severity alert when the phishing detection rule returns matching events.
+
+![Triggered Alert](screenshots/3_triggered-alert.png)
+
+---
+
+### Phishing Detection Result
+
+The SPL detection logic evaluates phishing indicators such as urgency, identity verification requests, and account suspension language.
+
+The event below was classified with:
+
+`phishing_indicator = YES`
+
+![Phishing Detection Result](screenshots/4_phishing-detection-result.png)
+
+---
+
+### Alert Configuration
+
+The phishing detection rule is configured as a scheduled alert with automated trigger actions.
+
+![Alert Configuration](screenshots/5_alert-configuration.png)
+
+---
+
+### Analyst Email Notification
+
+When the phishing alert is triggered, Splunk sends an automated email notification to the analyst.
+
+![Email Notification](screenshots/6_email-notification.png)
