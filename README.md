@@ -472,3 +472,77 @@ This project reinforced several practical SOC and security engineering concepts:
 - SIEM dashboards are useful for investigation, but automated detection and alerting are essential for operational monitoring.
 - Lab configurations such as disabled TLS verification should not be copied directly into production environments.
 
+## Skills Demonstrated
+
+This project demonstrates practical experience across security operations, automation, threat intelligence, SIEM engineering, and incident detection.
+
+### Security Operations & Detection Engineering
+
+- Phishing email analysis and detection
+- Development of custom SPL detection logic
+- Identification of suspicious email content and URLs
+- SIEM-based security monitoring
+- Scheduled alert creation and tuning
+- High-severity security alert generation
+- Investigation of triggered security events
+
+### Splunk & SIEM
+
+- Splunk Enterprise deployment and configuration
+- HTTP Event Collector (HEC) configuration
+- Custom index and sourcetype management
+- SPL search development
+- Field extraction and normalization
+- Security dashboard development
+- Scheduled detection rules
+- Triggered Alerts
+- SMTP-based analyst notification
+
+### Python Security Automation
+
+- Automated Gmail monitoring using IMAP
+- Email parsing and metadata extraction
+- URL extraction using regular expressions
+- Attachment processing
+- JSON event generation
+- REST API integration
+- Automated forwarding of security events to Splunk HEC
+- Environment-variable based secrets management
+
+### Threat Intelligence
+
+- VirusTotal API integration
+- Automated URL reputation analysis
+- Threat-intelligence enrichment
+- Analysis of malicious, suspicious, harmless, and undetected URL classifications
+- Combining threat intelligence with behavioral/content-based detection
+
+### Networking & Troubleshooting
+
+- TCP port connectivity testing
+- Splunk HEC troubleshooting on TCP/8088
+- TLS handshake validation
+- Self-signed certificate troubleshooting
+- HTTP/HTTPS testing with `curl`
+- Network testing with `nc`
+- TLS diagnostics with `openssl`
+- Authentication and API troubleshooting
+
+### Security Engineering Practices
+
+- Separation of credentials from source code using `.env`
+- Git-based secrets protection with `.gitignore`
+- Use of `.env.example` for reproducible configuration
+- Controlled phishing simulation
+- End-to-end security workflow testing
+- Documentation of detection logic and investigation evidence
+
+- ## Project Outcome
+
+The completed lab demonstrates an end-to-end automated phishing detection workflow capable of collecting email activity, enriching URLs with external threat intelligence, forwarding structured security events to Splunk, detecting phishing indicators, visualizing activity through a SOC dashboard, generating high-severity alerts, and notifying an analyst by email.
+
+The final workflow is:
+
+**Phishing Simulation → Gmail → Python Monitoring → VirusTotal Enrichment → Splunk HEC → SPL Detection → SOC Dashboard → High-Severity Alert → Analyst Email Notification**
+
+The project was developed entirely within a controlled lab environment for cybersecurity education and defensive security testing.
