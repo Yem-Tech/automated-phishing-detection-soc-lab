@@ -178,6 +178,66 @@ The phishing detection rule is configured as a scheduled alert with automated tr
 
 ---
 
+## Detection Logic & SPL Queries
+
+Splunk Search Processing Language (SPL) is used to analyze the email events ingested from the Python monitoring pipeline, identify phishing indicators, and support SOC investigation and alerting.
+
+### Phishing Email Detection
+
+The primary detection rule evaluates email subject and body content for common phishing indicators, including urgency, identity verification requests, and account suspension language.
+
+```spl
+index="gmail_logs" source="email_monitor" sourcetype="email_event"
+| eval phishing_indicator=if(
+    like(subject,"%URGENT%")
+    OR like(body,"%verify your identity%")
+    OR like(body,"%account suspension%"),
+    "YES",
+    "NO"
+)
+| search phishing_indicator="YES"
+| table _time from to subject links{} phishing_indicator
+| sort - _time
+```
+
+This search identifies events containing the defined phishing indicators and assigns them a `phishing_indicator` value of `YES`. Matching events are used by the scheduled **Phishing Email Detection Alert**.
+
+### VirusTotal URL Enrichment
+
+URL reputation information returned by VirusTotal is extracted from the enriched email events and summarized in Splunk.
+
+```spl
+index="gmail_logs" source="email_monitor" sourcetype="email_event"
+subject="URGENT: Security Update Required for BNS Account*"
+| rename "vt_results{}.result.malicious" AS malicious
+         "vt_results{}.result.suspicious" AS suspicious
+         "vt_results{}.result.harmless" AS harmless
+         "vt_results{}.result.undetected" AS undetected
+| stats max(malicious) AS Malicious
+        max(suspicious) AS Suspicious
+        max(harmless) AS Harmless
+        max(undetected) AS Undetected
+```
+
+This allows the SOC analyst to compare content-based phishing indicators with URL reputation data rather than relying on a single detection source.
+
+### Alerting Logic
+
+The phishing detection search is configured as a scheduled Splunk alert. The alert runs every five minutes against recent email events and triggers when:
+
+```text
+Number of Results > 0
+```
+
+When triggered, Splunk:
+
+1. Creates an entry in **Triggered Alerts**.
+2. Assigns the configured alert severity.
+3. Provides access to the matching phishing event.
+4. Sends an automated email notification to the analyst.
+
+This demonstrates an end-to-end detection workflow from email collection and enrichment through SIEM detection, alert generation, and analyst notification.
+
 ### Analyst Email Notification
 
 When the phishing alert is triggered, Splunk sends an automated email notification to the analyst.
