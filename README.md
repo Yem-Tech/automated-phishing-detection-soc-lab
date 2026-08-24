@@ -24,29 +24,38 @@ The project demonstrates the integration of security automation, threat intellig
 
 ## Architecture
 
+## Architecture
+
 The project follows the workflow below:
 
-Phishing Simulation (`phish_sender.py`)
-        ↓
-Gmail
-        ↓
-Python Email Monitor (`email_monitor.py`)
-        ↓
-Email Parsing & URL Extraction
-        ↓
-VirusTotal API Enrichment
-        ↓
-Structured JSON Security Event
-        ↓
-Splunk HTTP Event Collector (HEC)
-        ↓
-Splunk `gmail_logs` Index
-        ↓
-SPL Detection & Analysis
-        ↓
-Phishing Detection Alert
-        ↓
-SOC Dashboard + Analyst Email Notification
+**Phishing Simulation (`phish_sender.py`)**  
+↓  
+**Gmail**  
+↓  
+**Python Email Monitor (`email_monitor.py`)**  
+↓  
+**Email Parsing & URL Extraction**  
+↓  
+**VirusTotal API Enrichment**  
+↓  
+**Structured JSON Security Event**  
+↓  
+**Splunk HTTP Event Collector (HEC)**  
+↓  
+**Splunk `gmail_logs` Index**  
+↓  
+**SPL Detection & Analysis**  
+↓  
+**Phishing Detection Alert**  
+↓  
+**SOC Dashboard + Analyst Email Notification**
+
+### Architecture Diagram
+
+The diagram below illustrates the complete data flow from controlled phishing simulation through threat-intelligence enrichment, Splunk detection, and analyst notification.
+
+![Automated Phishing Detection SOC Lab Architecture](screenshots/architecture-diagram.png)
+
 
 ## Technologies Used
 
@@ -63,10 +72,12 @@ SOC Dashboard + Analyst Email Notification
 - JSON
 - python-dotenv
 - Requests
+  
 
 ## Lab Environment
 
 The project was developed in a virtualized cybersecurity lab environment using VirtualBox. Separate virtual machines were used to isolate the security monitoring components and simulate a realistic SOC architecture.
+
 
 ### Kali Linux
 
@@ -81,6 +92,7 @@ Primary functions included:
 - Querying the VirusTotal API for URL reputation
 - Sending enriched security events to Splunk through HEC
 - Testing connectivity between the monitoring system and Splunk
+  
 
 ### Ubuntu Server
 
@@ -95,12 +107,14 @@ Primary functions included:
 - Hosting the phishing monitoring dashboard
 - Generating scheduled high-severity alerts
 - Sending automated email notifications to the analyst
+  
 
 ### Gmail
 
 Gmail was used as the email platform for the controlled phishing simulation.
 
 The Python monitoring script connects to Gmail through IMAP and processes messages from the monitored mailbox. SMTP was also configured in Splunk to deliver automated phishing alert notifications to the analyst.
+
 
 ### VirusTotal
 
@@ -115,6 +129,7 @@ For each extracted URL, the monitoring script records available reputation stati
 - VirusTotal analysis ID
 
 This enrichment allows Splunk analysts to examine both email-based phishing indicators and external URL reputation data.
+
 
 ## Network and Data Flow
 
@@ -131,6 +146,7 @@ The primary communication flow in the lab is:
 9. SPL detection logic evaluates the event for phishing indicators.
 10. Matching events trigger a high-severity Splunk alert.
 11. Splunk records the alert under Triggered Alerts and sends an automated email notification to the analyst.
+    
 
 ## Project Evidence
 
@@ -188,6 +204,7 @@ When the phishing alert is triggered, Splunk sends an automated email notificati
 
 Splunk Search Processing Language (SPL) is used to analyze the email events ingested from the Python monitoring pipeline, identify phishing indicators, and support SOC investigation and alerting.
 
+
 ### Phishing Email Detection
 
 The primary detection rule evaluates email subject and body content for common phishing indicators, including urgency, identity verification requests, and account suspension language.
@@ -208,6 +225,7 @@ index="gmail_logs" source="email_monitor" sourcetype="email_event"
 
 This search identifies events containing the defined phishing indicators and assigns them a `phishing_indicator` value of `YES`. Matching events are used by the scheduled **Phishing Email Detection Alert**.
 
+
 ### VirusTotal URL Enrichment
 
 URL reputation information returned by VirusTotal is extracted from the enriched email events and summarized in Splunk.
@@ -227,6 +245,7 @@ subject="URGENT: Security Update Required for BNS Account*"
 
 This allows the SOC analyst to compare content-based phishing indicators with URL reputation data rather than relying on a single detection source.
 
+
 ### Alerting Logic
 
 The phishing detection search is configured as a scheduled Splunk alert. The alert runs every five minutes against recent email events and triggers when:
@@ -243,6 +262,7 @@ When triggered, Splunk:
 4. Sends an automated email notification to the analyst.
 
 This demonstrates an end-to-end detection workflow from email collection and enrichment through SIEM detection, alert generation, and analyst notification.
+
 
 ## Setup & Installation
 
@@ -375,6 +395,7 @@ The search can then be configured as a scheduled Splunk alert that:
 - Triggers when matching results are found
 - Creates a high-severity triggered alert
 - Sends an automated email notification to the analyst
+  
 
 ## Troubleshooting & Lessons Learned
 
@@ -448,11 +469,13 @@ mail.search(None, "UNSEEN")
 
 This limited processing to unread messages and reduced unnecessary API calls and processing time.
 
+
 ### Alert Filtering
 
 The phishing alert successfully triggered, but it initially appeared to be missing because the Splunk Triggered Alerts page was filtered to the wrong application.
 
 Changing the application filter revealed the triggered alert.
+
 
 ### SMTP Email Notification
 
@@ -508,6 +531,7 @@ This project demonstrates practical experience across security operations, autom
 - REST API integration
 - Automated forwarding of security events to Splunk HEC
 - Environment-variable based secrets management
+  
 
 ### Threat Intelligence
 
@@ -516,6 +540,7 @@ This project demonstrates practical experience across security operations, autom
 - Threat-intelligence enrichment
 - Analysis of malicious, suspicious, harmless, and undetected URL classifications
 - Combining threat intelligence with behavioral/content-based detection
+  
 
 ### Networking & Troubleshooting
 
@@ -527,6 +552,7 @@ This project demonstrates practical experience across security operations, autom
 - Network testing with `nc`
 - TLS diagnostics with `openssl`
 - Authentication and API troubleshooting
+  
 
 ### Security Engineering Practices
 
