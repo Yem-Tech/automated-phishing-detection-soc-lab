@@ -244,5 +244,137 @@ When triggered, Splunk:
 
 This demonstrates an end-to-end detection workflow from email collection and enrichment through SIEM detection, alert generation, and analyst notification.
 
+## Setup & Installation
+
+The following steps outline how to reproduce the lab environment.
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Yem-Tech/automated-phishing-detection-soc-lab.git
+cd automated-phishing-detection-soc-lab
+```
+
+### 2. Install Python Dependencies
+
+```bash
+pip3 install -r requirements.txt
+```
+
+### 3. Configure Environment Variables
+
+Create a local `.env` file based on `.env.example`:
+
+```text
+EMAIL_USER=your_email@example.com
+EMAIL_PASS=your_google_app_password
+VT_API_KEY=your_virustotal_api_key
+SPLUNK_TOKEN=your_splunk_hec_token
+SPLUNK_URL=https://YOUR_SPLUNK_SERVER:8088/services/collector
+SPLUNK_INDEX=gmail_logs
+```
+
+Do not commit the real `.env` file to GitHub.
+
+### 4. Configure Gmail
+
+1. Enable 2-Step Verification on the Gmail account used for the lab.
+2. Generate a Google App Password.
+3. Store the App Password in the local `.env` file as `EMAIL_PASS`.
+4. Ensure Gmail IMAP access is available for the account.
+
+### 5. Configure VirusTotal
+
+1. Create or sign in to a VirusTotal account.
+2. Obtain the VirusTotal API key.
+3. Store the API key in `.env` as `VT_API_KEY`.
+
+### 6. Configure Splunk Enterprise
+
+On the Ubuntu Server hosting Splunk:
+
+1. Install and start Splunk Enterprise.
+2. Create an index named:
+
+```text
+gmail_logs
+```
+
+3. Enable HTTP Event Collector (HEC).
+4. Create a HEC token for the project.
+5. Configure HEC to listen on port `8088`.
+6. Store the token and HEC URL in the local `.env` file.
+
+Example HEC URL:
+
+```text
+https://YOUR_SPLUNK_SERVER:8088/services/collector
+```
+
+### 7. Verify Splunk HEC Connectivity
+
+From the Kali Linux system, test HEC health:
+
+```bash
+curl -k https://YOUR_SPLUNK_SERVER:8088/services/collector/health
+```
+
+A healthy response should resemble:
+
+```json
+{"text":"HEC is healthy","code":17}
+```
+
+### 8. Run the Email Monitor
+
+```bash
+python3 email_monitor.py
+```
+
+The monitor checks unread messages in Gmail, extracts email metadata and URLs, enriches URLs with VirusTotal results, and forwards events to Splunk.
+
+### 9. Run the Phishing Simulation
+
+In a separate terminal:
+
+```bash
+python3 phish_sender.py
+```
+
+The script sends controlled phishing-simulation emails to the configured lab mailbox.
+
+### 10. Verify Events in Splunk
+
+Use Splunk Search & Reporting:
+
+```spl
+index="gmail_logs" source="email_monitor" sourcetype="email_event"
+```
+
+The events should contain fields such as:
+
+- Sender
+- Recipient
+- Subject
+- Email body
+- Extracted URLs
+- VirusTotal results
+- Attachments
+- Host
+- Source
+- Sourcetype
+
+### 11. Configure Detection and Alerting
+
+Use the SPL detection query documented in the **Detection Logic & SPL Queries** section to identify phishing indicators.
+
+The search can then be configured as a scheduled Splunk alert that:
+
+- Runs every 5 minutes
+- Searches recent email events
+- Triggers when matching results are found
+- Creates a high-severity triggered alert
+- Sends an automated email notification to the analyst
+
 
 
