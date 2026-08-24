@@ -22,7 +22,6 @@ Splunk is used to:
 
 The project demonstrates the integration of security automation, threat intelligence, SIEM monitoring, detection engineering, and SOC alerting within a controlled lab environment.
 
-## Architecture
 
 ## Architecture
 
