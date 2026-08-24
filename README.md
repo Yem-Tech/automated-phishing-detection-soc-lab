@@ -132,7 +132,7 @@ The primary communication flow in the lab is:
 10. Matching events trigger a high-severity Splunk alert.
 11. Splunk records the alert under Triggered Alerts and sends an automated email notification to the analyst.
 
-12. ## Project Evidence
+## Project Evidence
 
 ### Splunk SOC Dashboard
 
@@ -177,6 +177,12 @@ The phishing detection rule is configured as a scheduled alert with automated tr
 ![Alert Configuration](screenshots/5_alert-configuration.png)
 
 ---
+
+### Analyst Email Notification
+
+When the phishing alert is triggered, Splunk sends an automated email notification to the analyst.
+
+![Email Notification](screenshots/6_email-notification.png)
 
 ## Detection Logic & SPL Queries
 
@@ -238,8 +244,5 @@ When triggered, Splunk:
 
 This demonstrates an end-to-end detection workflow from email collection and enrichment through SIEM detection, alert generation, and analyst notification.
 
-### Analyst Email Notification
 
-When the phishing alert is triggered, Splunk sends an automated email notification to the analyst.
 
-![Email Notification](screenshots/6_email-notification.png)
