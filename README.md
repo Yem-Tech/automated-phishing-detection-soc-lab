@@ -376,5 +376,99 @@ The search can then be configured as a scheduled Splunk alert that:
 - Creates a high-severity triggered alert
 - Sends an automated email notification to the analyst
 
+## Troubleshooting & Lessons Learned
 
+Building the lab required troubleshooting across networking, authentication, API integration, Splunk ingestion, and alerting.
+
+### Splunk HEC Index Mismatch
+
+At one stage, Splunk returned:
+
+```text
+Incorrect index
+```
+
+The Python monitoring script was sending events to an index name that no longer matched the active Splunk index.
+
+This was resolved by aligning the configured Splunk index with the value used by the Python script and later moving the index name into the environment configuration.
+
+### Splunk HEC Authentication
+
+Manual HEC testing initially returned authorization errors because the Splunk HEC token was not correctly loaded into the terminal session.
+
+The issue was resolved by reloading the token and validating HEC with a manual `curl` request before testing the Python script.
+
+### HEC Connectivity and TLS
+
+Splunk HEC was listening on port `8088`, but some requests initially timed out.
+
+Troubleshooting included:
+
+- Verifying port `8088` was listening on the Ubuntu Server
+- Testing connectivity from Kali using `nc`
+- Testing HEC locally on Ubuntu
+- Validating the TLS handshake with `openssl`
+- Testing HEC health with `curl`
+
+This helped isolate application issues from network and TLS issues.
+
+### Self-Signed Certificate
+
+The Splunk lab server used a self-signed certificate. For the controlled lab environment, certificate verification was disabled in the Python HEC request.
+
+This is suitable only for the lab. A production environment should use trusted certificates and certificate validation.
+
+### Gmail IMAP Connection
+
+Gmail IMAP connections initially failed because local security software was inspecting SSL/TLS traffic.
+
+After identifying the TLS interception, the issue was resolved and IMAP authentication succeeded using a Google App Password.
+
+### VirusTotal URL Submission
+
+The VirusTotal submission initially returned an HTTP `400` response.
+
+The issue was caused by the way the URL was submitted in the POST request. Changing the request to submit the URL as form data resolved the problem and allowed VirusTotal enrichment results to appear in Splunk.
+
+### Processing Too Many Emails
+
+The first monitoring version searched all mailbox messages using:
+
+```python
+mail.search(None, "ALL")
+```
+
+This caused the script to process old emails and large numbers of URLs repeatedly.
+
+The search was changed to:
+
+```python
+mail.search(None, "UNSEEN")
+```
+
+This limited processing to unread messages and reduced unnecessary API calls and processing time.
+
+### Alert Filtering
+
+The phishing alert successfully triggered, but it initially appeared to be missing because the Splunk Triggered Alerts page was filtered to the wrong application.
+
+Changing the application filter revealed the triggered alert.
+
+### SMTP Email Notification
+
+Splunk's internal alerting worked before external email notification was configured.
+
+SMTP was configured using Gmail with TLS and a Google App Password. After correcting the mail settings, Splunk successfully delivered the phishing alert notification to the analyst's email inbox.
+
+## Key Lessons
+
+This project reinforced several practical SOC and security engineering concepts:
+
+- Validate each integration independently before troubleshooting the full pipeline.
+- Use environment variables for credentials and API keys.
+- Separate network, authentication, ingestion, detection, and notification problems during troubleshooting.
+- Threat intelligence should enrich detection decisions rather than act as the only detection source.
+- A URL with zero malicious VirusTotal detections can still appear in a phishing email.
+- SIEM dashboards are useful for investigation, but automated detection and alerting are essential for operational monitoring.
+- Lab configurations such as disabled TLS verification should not be copied directly into production environments.
 
